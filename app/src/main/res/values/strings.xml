@@ -1,0 +1,10 @@
+<resources>
+    <string name="app_name">Tareas</string>
+    <string-array name="prioridad">
+        <item>Alta</item>
+        <item>Media</item>
+        <item>Baja</item>
+    </string-array>
+    <string name="title_activity_main">Tareas</string>
+    <string name="title_activity_crear">Crear Tarea</string>
+</resources>
