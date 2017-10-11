@@ -14,6 +14,7 @@ import android.widget.SimpleCursorAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+import cl.duoc.android.tareas.adapter.CustomAdapter;
 import cl.duoc.android.tareas.db.TareasDbHelper;
 import cl.duoc.android.tareas.entities.Tarea;
 
@@ -34,7 +35,8 @@ public class MainActivity extends AppCompatActivity {
         TareasDbHelper tareasDbHelper = new TareasDbHelper(this);
         listaTareas = tareasDbHelper.getTareas();
         ListView lvListaTareas = (ListView) findViewById(R.id.lvListaTareas);
-        ArrayAdapter<Tarea> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, listaTareas);
+        //ArrayAdapter<Tarea> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_2, listaTareas);
+        CustomAdapter adapter = new CustomAdapter(this, listaTareas);
         lvListaTareas.setAdapter(adapter);
     }
 
