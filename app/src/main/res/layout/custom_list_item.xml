@@ -38,6 +38,7 @@
             android:id="@+id/texto3"
             android:text="Oct 10 2017"
             android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 

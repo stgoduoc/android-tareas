@@ -10,6 +10,7 @@ public class Tarea {
     private String tarea;
     private int prioridad;
     private Calendar fechaCreacion = Calendar.getInstance();
+    private Boolean realizada;
     private Bitmap imagen;
     private Double latitud;
     private Double longitud;
@@ -17,11 +18,12 @@ public class Tarea {
     public Tarea() {
     }
 
-    public Tarea(Long id, String tarea, int prioridad, Calendar fechaCreacion, Bitmap imagen, Double latitud, Double longitud) {
+    public Tarea(Long id, String tarea, int prioridad, Calendar fechaCreacion, Boolean realizada, Bitmap imagen, Double latitud, Double longitud) {
         this.id = id;
         this.tarea = tarea;
         this.prioridad = prioridad;
         this.fechaCreacion = fechaCreacion;
+        this.realizada = realizada;
         this.imagen = imagen;
         this.latitud = latitud;
         this.longitud = longitud;
@@ -89,12 +91,21 @@ public class Tarea {
         this.longitud = longitud;
     }
 
+    public Boolean getRealizada() {
+        return realizada;
+    }
+
+    public void setRealizada(Boolean realizada) {
+        this.realizada = realizada;
+    }
+
     @Override
     public String toString() {
         return "Tarea{" +
                 "id=" + id +
                 ", tarea='" + tarea + '\'' +
                 ", prioridad=" + prioridad +
+                ", realizada=" + realizada +
                 '}';
     }
 }

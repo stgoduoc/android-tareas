@@ -27,6 +27,7 @@ public class TareasDbHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ID           = "id";
     public static final String COLUMN_TAREA        = "tarea";
     public static final String COLUMN_PRIORIDAD    = "prioridad";
+    public static final String COLUMN_REALIZADA    = "realizada";
     public static final String COLUMN_IMAGEN       = "imagen";
     public static final String COLUMN_LATITUD      = "latitud";
     public static final String COLUMN_LONGITUD     = "longitud";
@@ -36,7 +37,21 @@ public class TareasDbHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 1;
 
     public TareasDbHelper(Context context){
-        super(context, Environment.getExternalStorageDirectory()+ File.separator + DATABASE_NAME, null, DATABASE_VERSION);
+        // guarda BD en espacio privado
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+
+        //guardado en External Storage
+        //super(context, Environment.getExternalStorageDirectory()+ File.separator + DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public boolean eliminarTarea(Tarea tarea) {
+        return eliminarTarea(tarea.getId());
+    }
+
+    public boolean eliminarTarea(Long tareaId) {
+        SQLiteDatabase writableDatabase = getWritableDatabase();
+        int eliminados = writableDatabase.delete(TABLE_NAME, "id = ?", new String[]{tareaId + ""});
+        return eliminados>0?true:false;
     }
 
     public void crearTarea(Tarea tarea) {
@@ -44,13 +59,17 @@ public class TareasDbHelper extends SQLiteOpenHelper {
         ContentValues contentValues = new ContentValues();
         contentValues.put(COLUMN_TAREA, tarea.getTarea());
         contentValues.put(COLUMN_PRIORIDAD, tarea.getPrioridad());
+        contentValues.put(COLUMN_REALIZADA, tarea.getPrioridad());
         contentValues.put(COLUMN_FECHA_CREACION, tarea.getFechaCreacion().getTimeInMillis());
 
         // image blob
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-        tarea.getImagen().compress(Bitmap.CompressFormat.JPEG, 0, byteArrayOutputStream);
-        byte[] imageBytes = byteArrayOutputStream.toByteArray();
-        contentValues.put(COLUMN_IMAGEN, imageBytes);
+        if(tarea.getImagen() != null) {
+            ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+            tarea.getImagen().compress(Bitmap.CompressFormat.PNG, 0, byteArrayOutputStream);
+            byte[] imageBytes = byteArrayOutputStream.toByteArray();
+            contentValues.put(COLUMN_IMAGEN, imageBytes);
+        }
+
 
         // guarda en BD
         writableDatabase.insert(TareasDbHelper.TABLE_NAME, null, contentValues);
@@ -59,10 +78,11 @@ public class TareasDbHelper extends SQLiteOpenHelper {
 
     public List<Tarea> getTareas(){
         SQLiteDatabase readableDatabase = getReadableDatabase();
-        String sql = String.format("SELECT %s, %s, %s, %s, %s, %s, %s FROM %s"
+        String sql = String.format("SELECT %s, %s, %s, %s, %s, %s, %s, %s FROM %s"
                                 , COLUMN_ID
                                 , COLUMN_TAREA
                                 , COLUMN_PRIORIDAD
+                                , COLUMN_REALIZADA
                                 , COLUMN_FECHA_CREACION
                                 , COLUMN_IMAGEN
                                 , COLUMN_LATITUD
@@ -74,13 +94,14 @@ public class TareasDbHelper extends SQLiteOpenHelper {
         while(cursor.moveToNext()) {
             Calendar fechaCreacion = Calendar.getInstance();
             fechaCreacion.setTimeInMillis(cursor.getLong(3));
+            boolean realizada = cursor.getInt(4)>0?true:false;
             Bitmap bitmap = null;
-            byte[] imageBlob = cursor.getBlob(4);
+            byte[] imageBlob = cursor.getBlob(5);
             if(imageBlob != null && imageBlob.length > 0) {
                 bitmap = BitmapFactory.decodeByteArray(imageBlob, 0, imageBlob.length);
             }
             Tarea tarea = new Tarea(cursor.getLong(0), cursor.getString(1), cursor.getInt(2)
-                                , fechaCreacion, bitmap, null, null);
+                                , fechaCreacion, realizada, bitmap, null, null);
             lista.add(tarea);
         }
         return lista;
@@ -92,6 +113,7 @@ public class TareasDbHelper extends SQLiteOpenHelper {
                 COLUMN_ID + " INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT , " +
                 COLUMN_TAREA + " TEXT NOT NULL , " +
                 COLUMN_PRIORIDAD + " INTEGER DEFAULT 1 ," +
+                COLUMN_REALIZADA + " BOOLEAN DEFAULT 0 ," +
                 COLUMN_LATITUD + " REAL," +
                 COLUMN_LONGITUD + " REAL ," +
                 COLUMN_IMAGEN + " BLOB ," +
